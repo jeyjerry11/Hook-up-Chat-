@@ -1,0 +1,25 @@
+<h2>Select Payment Gateway</h2>
+<button onclick="chooseGateway('paystack')">Pay with Paystack</button>
+<button onclick="chooseGateway('flutterwave')">Pay with Flutterwave</button>
+<button onclick="window.history.back()">Back</button>
+
+<script>
+  function chooseGateway(gateway){
+    localStorage.setItem("gateway", gateway);
+    // Redirect to backend route for actual processing
+    window.location.href = "/pay";
+  }
+</script>
+<h2>Select Payment Gateway</h2>
+<button onclick="chooseGateway('paystack')">Pay with Paystack</button>
+<button onclick="chooseGateway('flutterwave')">Pay with Flutterwave</button>
+<button onclick="window.history.back()">Back</button>
+
+<script>
+function chooseGateway(gateway) {
+  const data = JSON.parse(localStorage.getItem("paymentData"));
+  data.gateway = gateway;
+  localStorage.setItem("paymentData", JSON.stringify(data));
+  window.location.href = "/initialize-payment";
+}
+</script>

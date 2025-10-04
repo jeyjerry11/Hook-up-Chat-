@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nearby Hookup Chat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+    header {
+      background: #222;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+    }
+    .celeb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .celeb-card {
+      background: gray;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .celeb-card:hover {
+      transform: scale(1.03);
+    }
+    .celeb-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .celeb-card h3 {
+      margin: 10px;
+      font-size: 16px;
+      text-align: center;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.2);
+    }
+    .price-list button {
+      margin: 5px 0;
+      padding: 10px;
+      width: 100%;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .close-btn {
+      background: #ccc;
+      margin-top: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    h3.note {
+      text-align: center;
+      font-weight: normal;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Nearby Girls To Talk With</h1>
+    <p>Video & Audio Calls Available</p>
+  </header>
+
+  <div class="celeb-grid" id="celebGrid"></div>
+
+  <!-- Price Modal -->
+  <div class="modal" id="priceModal">
+    <div class="modal-content">
+      <h2 id="modalCelebName"></h2>
+      <p>Buy Talktime To Chat:</p>
+      <div class="price-list" id="priceList"></div>
+      <button class="close-btn" onclick="closeModal('priceModal')">Cancel</button>
+    </div>
+  </div>
+
+  <h3 class="note">To see more, first talk to all these ladies 👑</h3>
+
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script>
+    // --- CELEBRITIES ---
+    const celebrities = [
+      {name: "Jenifer Doe", img: "20.png"},
+      {name: "Jane Smith", img: "21.png"},
+      {name: "Christabel Star", img: "22.png"},
+      {name: "Ariana B Nova", img: "23.png"},
+      {name: "Michel Blaze", img: "24.png"},
+      {name: "Jenifer", img: "1.png"},
+      {name: "Ane Hot love", img: "2.png"},
+      {name: "Christabel", img: "3.png"},
+      {name: "Ariana", img: "4.png"},
+      {name: "SexyBlaze", img: "5.jpg"},
+      {name: "Mary Anderson", img: "6.jpg"},
+      {name: "Jane Stone", img: "7.jpg"},
+      {name: "Star Willson", img: "8.jpg"},
+      {name: "Beauty Mill", img: "9.jpg"},
+      {name: "Magi", img: "10.jpg"},
+      {name: "Cary Hanson", img: "11.jpg"},
+      {name: "Katrine Willams", img: "12.jpg"},
+      {name: "Annie Bill", img: "13.jpg"},
+      {name: "Bibiana Cane", img: "14.jpg"},
+      {name: "Angela Drago", img: "15.jpg"},
+      {name: "Catarin John Doe", img: "16.jpg"},
+      {name: "Debra Groge", img: "17.jpg"},
+      {name: "Elizabet Imoaral", img: "25.png"},
+      {name: "Dennis Johnson", img: "19.png"},
+      {name: "Felisha Ozon", img: "20.png"},
+      {name: "Glory Gate", img: "26.png"},
+      {name: "Hannah Handason", img: "27.png"},
+      {name: "Gaberila Joe", img: "28.png"},
+      {name: "Ino Andrew", img: "29.png"},
+      {name: "Jennet Falcon", img: "30.jpg"},
+      {name: "Sarah Bekam", img: "25.png"}
+    ];
+
+    // --- PRICES ---
+   // Define the available service tiers
+// Define the available service tiers
+const prices = [
+  { amount: 5000, minutes: 30, label: "30 minutes session" },
+  { amount: 15000, minutes: 100, label: "100 minutes session" },
+  { amount: 50000, minutes: 500, label: "Premium 500-minute meetup" },
+  { amount: 200000, minutes: 1440, label: "VIP full-day (24 hours) session" }
+];
+    // --- DOM ELEMENTS ---
+    const celebGrid = document.getElementById('celebGrid');
+    const priceModal = document.getElementById('priceModal');
+    const modalCelebName = document.getElementById('modalCelebName');
+    const priceList = document.getElementById('priceList');
+
+    // --- RENDER CARDS ---
+    celebrities.forEach(celeb => {
+      const card = document.createElement('div');
+      card.className = 'celeb-card';
+      card.innerHTML = `<img src="${celeb.img}" alt="${celeb.name}"><h3>${celeb.name}</h3>`;
+      card.onclick = () => openPriceModal(celeb.name);
+      celebGrid.appendChild(card);
+    });
+
+    // --- OPEN PRICE MODAL ---
+    function openPriceModal(name) {
+      modalCelebName.textContent = name;
+      priceList.innerHTML = '';
+      prices.forEach(p => {
+        const btn = document.createElement('button');
+        btn.textContent = `₦${p.amount} — ${p.minutes} mins`;
+        btn.onclick = () => startPaystackPayment(p.amount, name);
+        priceList.appendChild(btn);
+      });
+      priceModal.style.display = 'flex';
+    }
+
+    // --- CLOSE MODAL ---
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    // --- PAYSTACK POPUP ---
+    function startPaystackPayment(amount, celebName) {
+      closeModal('priceModal');
+
+      const email = prompt("Enter your email to continue payment:");
+      if (!email) return alert("Payment cancelled.");
+
+      let handler = PaystackPop.setup({
+        key: 'pk_test_xxxxxxxxxxxxxxxxxxxxxxx', // 🔑 Replace with your Paystack public key
+        email: email,
+        amount: amount * 100, // convert to kobo
+        currency: 'NGN',
+        ref: 'CHAT_' + Math.floor((Math.random() * 1000000000) + 1),
+        metadata: {
+          custom_fields: [
+            { display_name: "Chat Partner", variable_name: "celeb_name", value: celebName }
+          ]
+        },
+        callback: function(response) {
+          alert(`✅ Payment successful! Reference: ${response.reference}`);
+
+          // TODO: send this ref to backend to verify & email user/admin
+          // fetch('/verify-payment', {method:'POST', body: JSON.stringify({ref: response.reference})})
+        },
+        onClose: function() {
+          alert('Payment window closed.');
+        }
+      });
+
+      handler.openIframe(); // 🚀 Paystack opens here
+    }
+
+    // --- CLICK OUTSIDE TO CLOSE ---
+    window.onclick = function(event) {
+      if (event.target === priceModal) closeModal('priceModal');
+    };
+  </script>
+
+</body>
+</html>
